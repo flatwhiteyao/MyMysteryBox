@@ -5,7 +5,7 @@ const Login = () => {
     const [phone, setPhone] = useState('');
     const [password, setPassword] = useState('');
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         // 验证手机号格式
@@ -15,12 +15,30 @@ const Login = () => {
             return;
         }
 
-        console.log('手机号:', phone, '密码:', password);
-        // 这里可以添加实际的登录API调用
+        try {
+            const response = await fetch('http://localhost:7001/user/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    phone,
+                    password
+                })
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                alert('登录成功');
+            } else {
+                alert(data.message);
+            }
+        } catch (error) {
+            alert('登录失败，请稍后重试');
+        }
     };
 
     return (
-        
         <div className="flex justify-center items-center h-screen bg-gray-100">
             <form onSubmit={handleSubmit} className="bg-white p-8 rounded shadow-md w-full max-w-md">
                 <h2 className="text-2xl font-bold mb-6 text-center">登录</h2>

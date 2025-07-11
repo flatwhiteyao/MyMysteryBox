@@ -16,7 +16,7 @@ const Register = () => {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         // 验证必填字段
@@ -38,8 +38,24 @@ const Register = () => {
             return;
         }
 
-        console.log('注册信息:', formData);
-        // 这里可以添加实际的注册API调用
+        try {
+            const response = await fetch('http://localhost:7001/user/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                alert('注册成功');
+            } else {
+                alert(data.message);
+            }
+        } catch (error) {
+            alert('注册失败，请稍后重试');
+        }
     };
 
     return (
