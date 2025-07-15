@@ -8,7 +8,8 @@ const Register = () => {
         phone: '',
         email: '',
         password: '',
-        confirmPassword: ''
+        confirmPassword: '',
+        role: 'user'
     });
 
     const handleChange = (e) => {
@@ -156,6 +157,22 @@ const Register = () => {
                         onChange={handleChange}
                         required
                     />
+                </div>
+
+                <div className="mb-4">
+                    <label htmlFor="role" className="block text-gray-700 text-sm font-bold mb-2">
+                        身份
+                    </label>
+                    <select
+                        id="role"
+                        name="role"
+                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        value={formData.role}
+                        onChange={handleChange}
+                    >
+                        <option value="user">普通用户</option>
+                        <option value="admin">管理员</option>
+                    </select>
                 </div>
 
                 <div className="flex justify-center">

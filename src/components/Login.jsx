@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Login = () => {
     const [phone, setPhone] = useState('');
     const [password, setPassword] = useState('');
+    const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -30,6 +31,8 @@ const Login = () => {
             const data = await response.json();
             if (data.success) {
                 alert('登录成功');
+                // 跳转到盲盒商品主页面，并传递用户信息
+                navigate('/blind-box', { state: { user: data.user } });
             } else {
                 alert(data.message);
             }
