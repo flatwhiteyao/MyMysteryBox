@@ -1,3 +1,5 @@
+// src_frontend/components/BlindBoxPage.jsx
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -6,7 +8,7 @@ const BlindBoxPage = () => {
     const [isManageMode, setIsManageMode] = useState(false);
     const [selectedBlindBox, setSelectedBlindBox] = useState(null);
     const [showCreateForm, setShowCreateForm] = useState(false);
-    const [formData, setFormData] = useState({ name: '', description: '', price: '' });
+    const [formData, setFormData] = useState({ name: '', description: '', price: '', photo: null });
     
     const navigate = useNavigate();
     const location = useLocation();
@@ -73,14 +75,19 @@ const BlindBoxPage = () => {
             return alert('名称和价格不能为空');
         }
 
+        const formDataToSend = new FormData();
+        formDataToSend.append('id', selectedBlindBox.id);
+        formDataToSend.append('name', formData.name);
+        formDataToSend.append('description', formData.description);
+        formDataToSend.append('price', formData.price);
+        if (formData.photo) {
+            formDataToSend.append('photo', formData.photo);
+        }
+
         try {
             const response = await fetch('http://localhost:7001/blind-box', {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    id: selectedBlindBox.id,
-                    ...formData
-                })
+                body: formDataToSend
             });
 
             const data = await response.json();
@@ -99,15 +106,20 @@ const BlindBoxPage = () => {
 
     // 创建盲盒
     const handleCreate = async () => {
-        if (!formData.name || !formData.price) {
-            return alert('名称和价格不能为空');
+        if (!formData.name || !formData.price || !formData.photo) {
+            return alert('名称、价格和照片不能为空');
         }
+
+        const formDataToSend = new FormData();
+        formDataToSend.append('name', formData.name);
+        formDataToSend.append('description', formData.description);
+        formDataToSend.append('price', formData.price);
+        formDataToSend.append('photo', formData.photo);
 
         try {
             const response = await fetch('http://localhost:7001/blind-box', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData)
+                body: formDataToSend
             });
 
             const data = await response.json();
@@ -115,7 +127,7 @@ const BlindBoxPage = () => {
                 alert('创建成功');
                 fetchBlindBoxes();
                 setShowCreateForm(false);
-                setFormData({ name: '', description: '', price: '' });
+                setFormData({ name: '', description: '', price: '', photo: null });
             } else {
                 alert(data.message || '创建失败');
             }
@@ -128,7 +140,11 @@ const BlindBoxPage = () => {
     // 表单输入处理
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+        if (name === 'photo') {
+            setFormData(prev => ({ ...prev, [name]: e.target.files[0] }));
+        } else {
+            setFormData(prev => ({ ...prev, [name]: value }));
+        }
     };
 
     // 返回主视图
@@ -142,7 +158,7 @@ const BlindBoxPage = () => {
     const showCreate = () => {
         setShowCreateForm(true);
         setSelectedBlindBox(null);
-        setFormData({ name: '', description: '', price: '' });
+        setFormData({ name: '', description: '', price: '', photo: null });
     };
 
     return (
@@ -153,7 +169,7 @@ const BlindBoxPage = () => {
                 <div>
                     {user && (
                         <span className="text-gray-600 mr-4">
-                            欢迎，{user.username} ({user.role})
+                            欢迎，{user.nickname} ({user.role})
                         </span>
                     )}
                     <button
@@ -184,7 +200,11 @@ const BlindBoxPage = () => {
                         {blindBoxes.map(box => (
                             <div key={box.id} className="bg-gray-50 rounded-lg overflow-hidden shadow hover:shadow-md transition-shadow group">
                                 <div className="h-48 bg-gray-200 flex items-center justify-center">
-                                    <span className="text-gray-400">盲盒图片</span>
+                                    {box.photo ? (
+                                        <img src={`http://localhost:7001/${box.photo}`} alt={box.name} className="w-full h-full object-cover" />
+                                    ) : (
+                                        <span className="text-gray-400">盲盒图片</span>
+                                    )}
                                 </div>
                                 <div className="p-4">
                                     <h3 className="font-bold text-lg text-gray-800 mb-2 group-hover:text-blue-600 transition-colors">
@@ -248,7 +268,7 @@ const BlindBoxPage = () => {
                                     onChange={handleInputChange}
                                 ></textarea>
                             </div>
-                            <div className="mb-6">
+                            <div className="mb-4">
                                 <label className="block text-gray-700 font-medium mb-2" htmlFor="price">
                                     价格
                                 </label>
@@ -259,6 +279,18 @@ const BlindBoxPage = () => {
                                     id="price"
                                     name="price"
                                     value={formData.price}
+                                    onChange={handleInputChange}
+                                />
+                            </div>
+                            <div className="mb-6">
+                                <label className="block text-gray-700 font-medium mb-2" htmlFor="photo">
+                                    照片
+                                </label>
+                                <input
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    type="file"
+                                    id="photo"
+                                    name="photo"
                                     onChange={handleInputChange}
                                 />
                             </div>
@@ -346,4 +378,4 @@ const BlindBoxPage = () => {
     );
 };
 
-export default BlindBoxPage;    
+export default BlindBoxPage;
