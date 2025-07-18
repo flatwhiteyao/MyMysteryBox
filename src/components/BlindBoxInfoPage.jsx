@@ -6,7 +6,6 @@ const BlindBoxInfoPage = () => {
     const navigate = useNavigate();
     const [blindBox, setBlindBox] = useState(null);
     const [styles, setStyles] = useState([]);
-    const [drawnStyle, setDrawnStyle] = useState(null);
 
     useEffect(() => {
         const fetchBlindBox = async () => {
@@ -43,21 +42,9 @@ const BlindBoxInfoPage = () => {
         fetchStyles();
     }, [id]);
 
-    const handleDraw = async () => {
-        try {
-            const response = await fetch(`http://localhost:7001/blind-box/draw?id=${id}`);
-            const data = await response.json();
-            if (data.success) {
-                setDrawnStyle(data.style);
-                alert(`恭喜你抽到了：${data.style.name}`);
-                // 跳转到抽中款式详情页
-                navigate('/drawn-style-detail', { state: { style: data.style } });
-            } else {
-                alert(data.message || '抽取失败');
-            }
-        } catch (error) {
-            console.error('抽取盲盒错误:', error);
-            alert('网络错误，请稍后重试');
+    const handleDraw = () => {
+        if (blindBox) {
+            navigate('/payment', { state: { blindBoxId: id, price: blindBox.price } });
         }
     };
 

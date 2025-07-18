@@ -4,6 +4,7 @@ import Login from './components/Login';
 import Register from './components/Register';
 import BlindBoxPage from './components/BlindBoxPage';
 import BlindBoxInfoPage from './components/BlindBoxInfoPage';
+import PaymentPage from './components/PaymentPage';
 import DrawnStyleDetailPage from './components/DrawnStyleDetailPage';
 
 const App = () => {
@@ -14,6 +15,7 @@ const App = () => {
                 <Route path="/register" element={<Register />} />
                 <Route path="/blind-box" element={<BlindBoxPage />} />
                 <Route path="/blind-box/:id" element={<BlindBoxInfoPage />} />
+                <Route path="/payment" element={<PaymentPage />} />
                 <Route path="/drawn-style-detail" element={<DrawnStyleDetailPage />} />
                 <Route path="*" element={<Login />} />
             </Routes>

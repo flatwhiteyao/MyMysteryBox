@@ -5,6 +5,8 @@ import { useNavigate, useLocation } from 'react-router-dom';
 
 const BlindBoxPage = () => {
     const [blindBoxes, setBlindBoxes] = useState([]);
+    const [filteredBlindBoxes, setFilteredBlindBoxes] = useState([]);
+    const [searchKeyword, setSearchKeyword] = useState('');
     const [isManageMode, setIsManageMode] = useState(false);
     const [selectedBlindBox, setSelectedBlindBox] = useState(null);
     const [showCreateForm, setShowCreateForm] = useState(false);
@@ -20,12 +22,26 @@ const BlindBoxPage = () => {
         fetchBlindBoxes();
     }, []);
 
+    // 搜索过滤效果
+    useEffect(() => {
+        if (searchKeyword.trim() === '') {
+            setFilteredBlindBoxes(blindBoxes);
+        } else {
+            const filtered = blindBoxes.filter(box => 
+                box.name.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+                box.description.toLowerCase().includes(searchKeyword.toLowerCase())
+            );
+            setFilteredBlindBoxes(filtered);
+        }
+    }, [searchKeyword, blindBoxes]);
+
     const fetchBlindBoxes = async () => {
         try {
             const response = await fetch('http://localhost:7001/blind-box');
             const data = await response.json();
             if (data.success) {
                 setBlindBoxes(data.blindBoxes);
+                setFilteredBlindBoxes(data.blindBoxes);
             } else {
                 alert(data.message || '获取盲盒列表失败');
             }
@@ -219,6 +235,16 @@ const BlindBoxPage = () => {
         }
     };
 
+    // 搜索处理
+    const handleSearch = (e) => {
+        setSearchKeyword(e.target.value);
+    };
+
+    // 清除搜索
+    const clearSearch = () => {
+        setSearchKeyword('');
+    };
+
     return (
         <div className="min-h-screen bg-gray-100 p-4 md:p-8">
             {/* 顶部导航栏 */}
@@ -254,8 +280,41 @@ const BlindBoxPage = () => {
                         )}
                     </div>
 
+                    {/* 搜索框 */}
+                    <div className="mb-6">
+                        <div className="relative max-w-md">
+                            <input
+                                type="text"
+                                placeholder="搜索盲盒名称或描述..."
+                                value={searchKeyword}
+                                onChange={handleSearch}
+                                className="w-full px-4 py-2 pl-10 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            />
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </div>
+                            {searchKeyword && (
+                                <button
+                                    onClick={clearSearch}
+                                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                                >
+                                    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            )}
+                        </div>
+                        {searchKeyword && (
+                            <div className="mt-2 text-sm text-gray-600">
+                                找到 {filteredBlindBoxes.length} 个匹配的盲盒
+                            </div>
+                        )}
+                    </div>
+
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        {blindBoxes.map(box => (
+                        {filteredBlindBoxes.map(box => (
                             <div key={box.id} className="bg-gray-50 rounded-lg overflow-hidden shadow hover:shadow-md transition-shadow group">
                                 <div className="h-48 bg-gray-200 flex items-center justify-center">
                                     {box.photo ? (
@@ -307,6 +366,41 @@ const BlindBoxPage = () => {
                             <i className="fa fa-plus mr-1"></i> 创建新盲盒
                         </button>
                     </div>
+
+                    {/* 搜索框 - 仅在管理模式下显示 */}
+                    {!selectedBlindBox && !showCreateForm && (
+                        <div className="mb-6">
+                            <div className="relative max-w-md">
+                                <input
+                                    type="text"
+                                    placeholder="搜索盲盒名称或描述..."
+                                    value={searchKeyword}
+                                    onChange={handleSearch}
+                                    className="w-full px-4 py-2 pl-10 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                />
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                    </svg>
+                                </div>
+                                {searchKeyword && (
+                                    <button
+                                        onClick={clearSearch}
+                                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                                    >
+                                        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                )}
+                            </div>
+                            {searchKeyword && (
+                                <div className="mt-2 text-sm text-gray-600">
+                                    找到 {filteredBlindBoxes.length} 个匹配的盲盒
+                                </div>
+                            )}
+                        </div>
+                    )}
 
                     {/* 编辑/创建表单 */}
                     {selectedBlindBox || showCreateForm ? (
@@ -441,7 +535,7 @@ const BlindBoxPage = () => {
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                            {blindBoxes.map(box => (
+                            {filteredBlindBoxes.map(box => (
                                 <div key={box.id} className="bg-gray-50 rounded-lg overflow-hidden shadow hover:shadow-md transition-shadow group">
                                     <div className="h-48 bg-gray-200 flex items-center justify-center">
                                         {box.photo ? (
