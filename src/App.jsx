@@ -1,3 +1,4 @@
+// doubao/frontend/App.jsx
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from './components/Login';
@@ -6,6 +7,7 @@ import BlindBoxPage from './components/BlindBoxPage';
 import BlindBoxInfoPage from './components/BlindBoxInfoPage';
 import PaymentPage from './components/PaymentPage';
 import DrawnStyleDetailPage from './components/DrawnStyleDetailPage';
+import UserProfilePage from './components/UserProfilePage';
 
 const App = () => {
     return (
@@ -17,6 +19,7 @@ const App = () => {
                 <Route path="/blind-box/:id" element={<BlindBoxInfoPage />} />
                 <Route path="/payment" element={<PaymentPage />} />
                 <Route path="/drawn-style-detail" element={<DrawnStyleDetailPage />} />
+                <Route path="/user-profile" element={<UserProfilePage />} />
                 <Route path="*" element={<Login />} />
             </Routes>
         </Router>

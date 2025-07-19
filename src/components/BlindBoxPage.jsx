@@ -257,6 +257,12 @@ const BlindBoxPage = () => {
                         </span>
                     )}
                     <button
+                        className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition-colors mr-4"
+                        onClick={() => navigate('/user-profile', { state: { user } })}
+                    >
+                        个人主页
+                    </button>
+                    <button
                         className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition-colors"
                         onClick={() => navigate('/')}
                     >
