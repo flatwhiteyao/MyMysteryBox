@@ -31,8 +31,10 @@ const Login = () => {
             const data = await response.json();
             if (data.success) {
                 alert('登录成功');
-                // 跳转到盲盒商品主页面，并传递用户信息
-                navigate('/blind-box', { state: { user: data.user } });
+                // 存储用户ID到localStorage
+                localStorage.setItem('userId', data.user.id || data.user.userId || data.userId);
+                // 跳转到用户已抽到的盲盒页面，并传递用户ID
+                navigate('/user-drawn-blind-boxes', { state: { userId: data.user.id } });
             } else {
                 alert(data.message);
             }

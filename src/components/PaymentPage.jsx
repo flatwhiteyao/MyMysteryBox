@@ -8,7 +8,13 @@ const PaymentPage = () => {
 
     const handlePaymentSuccess = async () => {
         try {
-            const response = await fetch(`http://localhost:7001/blind-box/draw?id=${blindBoxId}`);
+            const userId = localStorage.getItem('userId');
+            if (!userId) {
+                alert('请先登录');
+                navigate('/login');
+                return;
+            }
+            const response = await fetch(`http://localhost:7001/blind-box/draw?id=${blindBoxId}&user_id=${userId}`);
             const data = await response.json();
             if (data.success) {
                 navigate('/drawn-style-detail', { state: { style: data.style } });

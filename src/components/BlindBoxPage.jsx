@@ -326,20 +326,14 @@ const BlindBoxPage = () => {
     };
 
     // 抽取盲盒
-    const drawBlindBox = async (id) => {
-        try {
-            console.log(`抽取盲盒: id=${id}`);
-            const response = await fetch(`http://localhost:7001/blind-box/draw?id=${id}`);
-            const data = await response.json();
-            if (data.success) {
-                alert(`恭喜你抽到了：${data.style.name}`);
-            } else {
-                throw new Error(data.message || '抽取失败');
-            }
-        } catch (error) {
-            console.error('抽取盲盒错误:', error);
-            alert(`抽取失败: ${error.message}`);
+    const drawBlindBox = (id, price) => {
+        const userId = localStorage.getItem('userId');
+        if (!userId) {
+            alert('请先登录');
+            navigate('/login');
+            return;
         }
+        navigate('/payment', { state: { blindBoxId: id, price } });
     };
 
     // 搜索处理
@@ -430,7 +424,7 @@ const BlindBoxPage = () => {
                                     </button>
                                     <button
                                         className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md transition-colors"
-                                        onClick={() => drawBlindBox(box.id)}
+                                        onClick={() => drawBlindBox(box.id, box.price)}
                                     >
                                         抽取盲盒
                                     </button>
