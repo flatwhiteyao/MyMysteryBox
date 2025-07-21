@@ -34,7 +34,7 @@ const Login = () => {
                 // 存储用户ID到localStorage
                 localStorage.setItem('userId', data.user.id || data.user.userId || data.userId);
                 // 跳转到用户已抽到的盲盒页面，并传递用户ID
-                navigate('/user-drawn-blind-boxes', { state: { userId: data.user.id } });
+                navigate('/blind-box', { state: { userId: data.user.id } });
             } else {
                 alert(data.message);
             }
