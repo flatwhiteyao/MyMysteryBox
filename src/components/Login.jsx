@@ -33,8 +33,9 @@ const Login = () => {
                 alert('登录成功');
                 // 存储用户ID到localStorage
                 localStorage.setItem('userId', data.user.id || data.user.userId || data.userId);
-                // 跳转到用户已抽到的盲盒页面，并传递用户ID
-                navigate('/blind-box', { state: { userId: data.user.id } });
+                localStorage.setItem('user', JSON.stringify(data.user));
+                // 跳转到盲盒商品主页面，并传递完整用户信息
+                navigate('/blind-box', { state: { user: data.user } });
             } else {
                 alert(data.message);
             }

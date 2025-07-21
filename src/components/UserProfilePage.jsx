@@ -4,7 +4,13 @@ import { useLocation, useNavigate } from 'react-router-dom';
 
 const UserProfilePage = () => {
     const location = useLocation();
-    const user = location.state?.user;
+    let user = location.state?.user;
+    if (!user) {
+        const userStr = localStorage.getItem('user');
+        if (userStr) {
+            user = JSON.parse(userStr);
+        }
+    }
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
         nickname: user?.nickname || '',

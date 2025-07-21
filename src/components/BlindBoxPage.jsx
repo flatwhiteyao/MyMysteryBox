@@ -17,7 +17,13 @@ const BlindBoxPage = () => {
 
     const navigate = useNavigate();
     const location = useLocation();
-    const user = location.state?.user;
+    let user = location.state?.user;
+    if (!user) {
+        const userStr = localStorage.getItem('user');
+        if (userStr) {
+            user = JSON.parse(userStr);
+        }
+    }
 
     // 获取盲盒列表
     useEffect(() => {
