@@ -60,7 +60,7 @@ const UserProfilePage = () => {
 
     // 模拟查看已购盲盒和物流信息
     const viewPurchasedBlindBoxes = () => {
-        alert('查看已购盲盒功能待实现');
+        navigate('/user-drawn-blind-boxes', { state: { user } });
     };
 
     const viewShippingInfo = () => {

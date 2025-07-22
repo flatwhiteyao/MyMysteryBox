@@ -8,6 +8,7 @@ import BlindBoxInfoPage from './components/BlindBoxInfoPage';
 import PaymentPage from './components/PaymentPage';
 import DrawnStyleDetailPage from './components/DrawnStyleDetailPage';
 import UserProfilePage from './components/UserProfilePage';
+import UserDrawnBlindBoxesPage from './components/UserDrawnBlindBoxesPage';
 
 const App = () => {
     return (
@@ -20,6 +21,7 @@ const App = () => {
                 <Route path="/payment" element={<PaymentPage />} />
                 <Route path="/drawn-style-detail" element={<DrawnStyleDetailPage />} />
                 <Route path="/user-profile" element={<UserProfilePage />} />
+                <Route path="/user-drawn-blind-boxes" element={<UserDrawnBlindBoxesPage />} />
                 <Route path="*" element={<Login />} />
             </Routes>
         </Router>
