@@ -39,10 +39,8 @@ const UserDrawnBlindBoxesPage = () => {
   const handleDelete = async (id) => {
     if (!window.confirm('确定要删除该订单吗？')) return;
     try {
-      const res = await fetch(`http://localhost:7001/user-drawn-blind-boxes/user-delete-drawn-blind-box`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id })
+      const res = await fetch(`http://localhost:7001/user-drawn-blind-boxes/${id}`, {
+        method: 'DELETE',
       });
       const data = await res.json();
       if (data.success) {
