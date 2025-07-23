@@ -9,6 +9,9 @@ import PaymentPage from './components/PaymentPage';
 import DrawnStyleDetailPage from './components/DrawnStyleDetailPage';
 import UserProfilePage from './components/UserProfilePage';
 import UserDrawnBlindBoxesPage from './components/UserDrawnBlindBoxesPage';
+import PlayerShowsPage from './components/PlayerShowsPage';
+import PlayerShowDetailPage from './components/PlayerShowDetailPage';
+import PlayerShowCreatePage from './components/PlayerShowCreatePage';
 
 const App = () => {
     return (
@@ -22,6 +25,9 @@ const App = () => {
                 <Route path="/drawn-style-detail" element={<DrawnStyleDetailPage />} />
                 <Route path="/user-profile" element={<UserProfilePage />} />
                 <Route path="/user-drawn-blind-boxes" element={<UserDrawnBlindBoxesPage />} />
+                <Route path="/player-shows" element={<PlayerShowsPage />} />
+                <Route path="/player-show-detail/:id" element={<PlayerShowDetailPage />} />
+                <Route path="/player-show-create" element={<PlayerShowCreatePage />} />
                 <Route path="*" element={<Login />} />
             </Routes>
         </Router>

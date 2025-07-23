@@ -356,6 +356,20 @@ const BlindBoxPage = () => {
 
     return (
         <div className="min-h-screen bg-gray-100 p-4 md:p-8">
+            {/* 玩家秀入口模块 */}
+            <div className="bg-gradient-to-r from-pink-400 to-yellow-300 rounded-xl shadow-lg p-6 mb-4 flex items-center cursor-pointer hover:scale-105 transition-transform" onClick={() => navigate('/player-shows')}>
+                <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="玩家秀" className="w-16 h-16 mr-6" />
+                <div>
+                    <div className="text-2xl font-bold text-white mb-1">玩家秀</div>
+                    <div className="text-white text-opacity-90">看看大家都晒了哪些好物，分享你的盲盒体验！</div>
+                </div>
+            </div>
+            <button
+                className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-md font-bold mb-8"
+                onClick={() => navigate('/player-show-create')}
+            >
+                发布玩家秀
+            </button>
             {/* 顶部导航栏 */}
             <header className="bg-white shadow-md rounded-lg p-4 mb-6 flex justify-between items-center">
                 <h1 className="text-2xl font-bold text-gray-800">盲盒商城</h1>
