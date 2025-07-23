@@ -58,13 +58,9 @@ const UserProfilePage = () => {
         }
     };
 
-    // 模拟查看已购盲盒和物流信息
+    // 模拟查看已购盲盒信息
     const viewPurchasedBlindBoxes = () => {
         navigate('/user-drawn-blind-boxes', { state: { user } });
-    };
-
-    const viewShippingInfo = () => {
-        alert('查看盲盒物流功能待实现');
     };
 
     return (
@@ -181,12 +177,6 @@ const UserProfilePage = () => {
                         onClick={viewPurchasedBlindBoxes}
                     >
                         查看已购盲盒
-                    </button>
-                    <button
-                        className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition-colors"
-                        onClick={viewShippingInfo}
-                    >
-                        查看盲盒物流
                     </button>
                 </div>
             </div>

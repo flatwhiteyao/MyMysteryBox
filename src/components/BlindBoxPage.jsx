@@ -364,12 +364,6 @@ const BlindBoxPage = () => {
                     <div className="text-white text-opacity-90">看看大家都晒了哪些好物，分享你的盲盒体验！</div>
                 </div>
             </div>
-            <button
-                className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-md font-bold mb-8"
-                onClick={() => navigate('/player-show-create')}
-            >
-                发布玩家秀
-            </button>
             {/* 顶部导航栏 */}
             <header className="bg-white shadow-md rounded-lg p-4 mb-6 flex justify-between items-center">
                 <h1 className="text-2xl font-bold text-gray-800">盲盒商城</h1>

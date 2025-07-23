@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import StarRating from './common/StarRating';
+import ImagePreview from './common/ImagePreview';
 
 const PlayerShowDetailPage = () => {
   const { id } = useParams();
@@ -63,15 +65,11 @@ const PlayerShowDetailPage = () => {
         <div className="text-gray-600 text-sm mb-1">盲盒：{show.blind_box_name || '-'}</div>
         <div className="mb-2">{show.content || '-'}</div>
         <div className="flex items-center mb-2">
-          <span className="text-yellow-400 mr-2">{'★'.repeat(show.rating || 0)}{'☆'.repeat(5 - (show.rating || 0))}</span>
+          <StarRating rating={show.rating || 0} />
           <span className="text-gray-400 text-xs">{show.rating ? show.rating + '分' : '-'}</span>
         </div>
         {Array.isArray(show.images) && show.images.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-2">
-            {show.images.map((img, idx) => (
-              <img key={idx} src={`http://localhost:7001/${img}`} alt="玩家秀配图" className="w-32 h-32 object-cover rounded border" />
-            ))}
-          </div>
+          <ImagePreview images={show.images} baseUrl="http://localhost:7001/" />
         )}
         <div className="text-gray-400 text-xs mt-4">创建时间：{show.created_at || '-'}</div>
       </div>
