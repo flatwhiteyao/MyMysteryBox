@@ -1,6 +1,7 @@
 // doubao/frontend/components/BlindBoxPage.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import StarRating from './common/StarRating';
 
 const BlindBoxPage = () => {
     const [blindBoxes, setBlindBoxes] = useState([]);
@@ -14,6 +15,8 @@ const BlindBoxPage = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalType, setModalType] = useState('edit');
     const [editingStyleIndex, setEditingStyleIndex] = useState(-1); // 正在编辑的款式索引，-1表示未编辑任何款式
+    const [ranking, setRanking] = useState([]);
+    const [rankingError, setRankingError] = useState('');
 
     const navigate = useNavigate();
     const location = useLocation();
@@ -28,6 +31,7 @@ const BlindBoxPage = () => {
     // 获取盲盒列表
     useEffect(() => {
         fetchBlindBoxes();
+        fetchRanking();
     }, []);
 
     // 搜索过滤效果
@@ -56,6 +60,20 @@ const BlindBoxPage = () => {
         } catch (error) {
             console.error('获取盲盒列表错误:', error);
             alert('网络错误，请稍后重试');
+        }
+    };
+
+    const fetchRanking = async () => {
+        try {
+            const response = await fetch('http://localhost:7001/player-shows/ranking');
+            const data = await response.json();
+            if (data.success) {
+                setRanking(data.ranking);
+            } else {
+                setRankingError(data.message || '获取排行榜失败');
+            }
+        } catch (error) {
+            setRankingError('网络错误，无法获取排行榜');
         }
     };
 
@@ -355,409 +373,445 @@ const BlindBoxPage = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-100 p-4 md:p-8">
-            {/* 玩家秀入口模块 */}
-            <div className="bg-gradient-to-r from-pink-400 to-yellow-300 rounded-xl shadow-lg p-6 mb-4 flex items-center cursor-pointer hover:scale-105 transition-transform" onClick={() => navigate('/player-shows')}>
-                <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="玩家秀" className="w-16 h-16 mr-6" />
-                <div>
-                    <div className="text-2xl font-bold text-white mb-1">玩家秀</div>
-                    <div className="text-white text-opacity-90">看看大家都晒了哪些好物，分享你的盲盒体验！</div>
-                </div>
-            </div>
-            {/* 顶部导航栏 */}
-            <header className="bg-white shadow-md rounded-lg p-4 mb-6 flex justify-between items-center">
-                <h1 className="text-2xl font-bold text-gray-800">盲盒商城</h1>
-                <div>
-                    {user && (
-                        <span className="text-gray-600 mr-4">
-                            欢迎，{user.nickname} ({user.role})
-                        </span>
-                    )}
-                    <button
-                        className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition-colors mr-4"
-                        onClick={() => navigate('/user-profile', { state: { user } })}
-                    >
-                        个人主页
-                    </button>
-                    <button
-                        className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition-colors"
-                        onClick={() => navigate('/')}
-                    >
-                        退出登录
-                    </button>
-                </div>
-            </header>
+        <div className="min-h-screen bg-gray-100 p-4 md:p-8 flex flex-col md:flex-row">
+            {/* 主内容区 */}
+            <div className="flex-1 md:mr-8">
+                {/* 顶部导航栏 */}
+                <header className="bg-white shadow-md rounded-lg p-4 mb-6 flex justify-between items-center">
+                    <h1 className="text-2xl font-bold text-gray-800">盲盒商城</h1>
+                    <div>
+                        {user && (
+                            <span className="text-gray-600 mr-4">
+                                欢迎，{user.nickname} ({user.role})
+                            </span>
+                        )}
+                        <button
+                            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition-colors mr-4"
+                            onClick={() => navigate('/user-profile', { state: { user } })}
+                        >
+                            个人主页
+                        </button>
+                        <button
+                            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition-colors"
+                            onClick={() => navigate('/')}
+                        >
+                            退出登录
+                        </button>
+                    </div>
+                </header>
 
-            {/* 错误提示 */}
-            {errorMessage && (
-                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                    <strong>错误:</strong> {errorMessage}
-                </div>
-            )}
+                {/* 错误提示 */}
+                {errorMessage && (
+                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                        <strong>错误:</strong> {errorMessage}
+                    </div>
+                )}
 
-            {/* 用户视图 - 普通用户 */}
-            {!isManageMode && (
-                <div className="bg-white rounded-xl shadow-lg p-6">
-                    <div className="flex justify-between items-center mb-6">
-                        <h2 className="text-xl font-bold text-gray-800">盲盒列表</h2>
-                        {user?.role === 'admin' && (
+                {/* 用户视图 - 普通用户 */}
+                {!isManageMode && (
+                    <div className="bg-white rounded-xl shadow-lg p-6">
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-xl font-bold text-gray-800">盲盒列表</h2>
+                            {user?.role === 'admin' && (
+                                <button
+                                    className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-md transition-colors"
+                                    onClick={toggleManageMode}
+                                >
+                                    管理模式
+                                </button>
+                            )}
+                        </div>
+                        <input
+                            type="text"
+                            placeholder="搜索盲盒"
+                            value={searchKeyword}
+                            onChange={handleSearch}
+                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4"
+                        />
+                        <button
+                            className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md transition-colors mb-4"
+                            onClick={clearSearch}
+                        >
+                            清除搜索
+                        </button>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {filteredBlindBoxes.map(box => (
+                                <div key={box.id} className="bg-white shadow-md rounded-lg p-4">
+                                    <img src={`http://localhost:7001/${box.photo}`} alt={box.name} className="w-full h-full object-cover" style={{ height: '200px' }} />
+                                    <h3 className="text-lg font-bold text-gray-800 mt-2">{box.name}</h3>
+                                    <p className="text-gray-600">{box.description}</p>
+                                    <p className="text-gray-600">价格: {box.price} 元</p>
+                                    <div className="flex justify-between items-center mt-4">
+                                        <button
+                                            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition-colors"
+                                            onClick={() => viewBlindBoxDetails(box.id)}
+                                        >
+                                            查看详情
+                                        </button>
+                                        <button
+                                            className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md transition-colors"
+                                            onClick={() => drawBlindBox(box.id, box.price)}
+                                        >
+                                            抽取盲盒
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* 管理视图 - 管理员 */}
+                {isManageMode && (
+                    <div className="bg-white rounded-xl shadow-lg p-6">
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-xl font-bold text-gray-800">盲盒管理</h2>
                             <button
                                 className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-md transition-colors"
                                 onClick={toggleManageMode}
                             >
-                                管理模式
+                                退出管理模式
                             </button>
-                        )}
-                    </div>
-                    <input
-                        type="text"
-                        placeholder="搜索盲盒"
-                        value={searchKeyword}
-                        onChange={handleSearch}
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4"
-                    />
-                    <button
-                        className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md transition-colors mb-4"
-                        onClick={clearSearch}
-                    >
-                        清除搜索
-                    </button>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {filteredBlindBoxes.map(box => (
-                            <div key={box.id} className="bg-white shadow-md rounded-lg p-4">
-                                <img src={`http://localhost:7001/${box.photo}`} alt={box.name} className="w-full h-full object-cover" style={{ height: '200px' }} />
-                                <h3 className="text-lg font-bold text-gray-800 mt-2">{box.name}</h3>
-                                <p className="text-gray-600">{box.description}</p>
-                                <p className="text-gray-600">价格: {box.price} 元</p>
-                                <div className="flex justify-between items-center mt-4">
-                                    <button
-                                        className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition-colors"
-                                        onClick={() => viewBlindBoxDetails(box.id)}
-                                    >
-                                        查看详情
-                                    </button>
-                                    <button
-                                        className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md transition-colors"
-                                        onClick={() => drawBlindBox(box.id, box.price)}
-                                    >
-                                        抽取盲盒
-                                    </button>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            )}
-
-            {/* 管理视图 - 管理员 */}
-            {isManageMode && (
-                <div className="bg-white rounded-xl shadow-lg p-6">
-                    <div className="flex justify-between items-center mb-6">
-                        <h2 className="text-xl font-bold text-gray-800">盲盒管理</h2>
+                        </div>
                         <button
-                            className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-md transition-colors"
-                            onClick={toggleManageMode}
+                            className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md transition-colors mb-4"
+                            onClick={openCreateModal}
                         >
-                            退出管理模式
+                            创建盲盒
                         </button>
-                    </div>
-                    <button
-                        className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md transition-colors mb-4"
-                        onClick={openCreateModal}
-                    >
-                        创建盲盒
-                    </button>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {filteredBlindBoxes.map(box => (
-                            <div key={box.id} className="bg-white shadow-md rounded-lg p-4">
-                                <img src={`http://localhost:7001/${box.photo}`} alt={box.name} className="w-full h-full object-cover" style={{ height: '200px' }} />
-                                <h3 className="text-lg font-bold text-gray-800 mt-2">{box.name}</h3>
-                                <p className="text-gray-600">{box.description}</p>
-                                <p className="text-gray-600">价格: {box.price} 元</p>
-                                <div className="flex justify-between items-center mt-4">
-                                    <button
-                                        className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-md transition-colors"
-                                        onClick={() => openEditModal(box)}
-                                    >
-                                        编辑
-                                    </button>
-                                    <button
-                                        className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition-colors"
-                                        onClick={() => handleDelete(box.id)}
-                                    >
-                                        删除
-                                    </button>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {filteredBlindBoxes.map(box => (
+                                <div key={box.id} className="bg-white shadow-md rounded-lg p-4">
+                                    <img src={`http://localhost:7001/${box.photo}`} alt={box.name} className="w-full h-full object-cover" style={{ height: '200px' }} />
+                                    <h3 className="text-lg font-bold text-gray-800 mt-2">{box.name}</h3>
+                                    <p className="text-gray-600">{box.description}</p>
+                                    <p className="text-gray-600">价格: {box.price} 元</p>
+                                    <div className="flex justify-between items-center mt-4">
+                                        <button
+                                            className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-md transition-colors"
+                                            onClick={() => openEditModal(box)}
+                                        >
+                                            编辑
+                                        </button>
+                                        <button
+                                            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition-colors"
+                                            onClick={() => handleDelete(box.id)}
+                                        >
+                                            删除
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            ))}
+                        </div>
                     </div>
-                </div>
-            )}
+                )}
 
-            {/* 弹窗组件 */}
-            {isModalOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 transition-opacity duration-300">
-                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto transform transition-all duration-300 scale-100">
-                        <div className="p-6">
-                            <div className="flex justify-between items-center mb-4">
-                                <h2 className="text-xl font-bold text-gray-800">
-                                    {modalType === 'edit' ? '编辑盲盒' : '创建盲盒'}
-                                </h2>
-                                <button
-                                    className="text-gray-500 hover:text-gray-700 focus:outline-none"
-                                    onClick={closeModal}
-                                >
-                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
-                                    </svg>
-                                </button>
-                            </div>
-                            
-                            {/* 错误提示 */}
-                            {errorMessage && (
-                                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                                    <strong>错误:</strong> {errorMessage}
+                {/* 弹窗组件 */}
+                {isModalOpen && (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 transition-opacity duration-300">
+                        <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto transform transition-all duration-300 scale-100">
+                            <div className="p-6">
+                                <div className="flex justify-between items-center mb-4">
+                                    <h2 className="text-xl font-bold text-gray-800">
+                                        {modalType === 'edit' ? '编辑盲盒' : '创建盲盒'}
+                                    </h2>
+                                    <button
+                                        className="text-gray-500 hover:text-gray-700 focus:outline-none"
+                                        onClick={closeModal}
+                                    >
+                                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+                                        </svg>
+                                    </button>
                                 </div>
-                            )}
-                            
-                            <form>
-                                <div className="mb-4">
-                                    <label htmlFor="name" className="block text-gray-700 text-sm font-bold mb-2">
-                                        名称
-                                    </label>
-                                    <input
-                                        type="text"
-                                        id="name"
-                                        name="name"
-                                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                        placeholder="请输入名称"
-                                        value={formData.name}
-                                        onChange={handleInputChange}
-                                    />
-                                </div>
-                                <div className="mb-4">
-                                    <label htmlFor="description" className="block text-gray-700 text-sm font-bold mb-2">
-                                        描述
-                                    </label>
-                                    <textarea
-                                        id="description"
-                                        name="description"
-                                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                        placeholder="请输入描述"
-                                        value={formData.description}
-                                        onChange={handleInputChange}
-                                    />
-                                </div>
-                                <div className="mb-4">
-                                    <label htmlFor="price" className="block text-gray-700 text-sm font-bold mb-2">
-                                        价格
-                                    </label>
-                                    <input
-                                        type="number"
-                                        id="price"
-                                        name="price"
-                                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                        placeholder="请输入价格"
-                                        value={formData.price}
-                                        onChange={handleInputChange}
-                                    />
-                                </div>
-                                <div className="mb-4">
-                                    <label htmlFor="photo" className="block text-gray-700 text-sm font-bold mb-2">
-                                        照片
-                                    </label>
-                                    <input
-                                        type="file"
-                                        id="photo"
-                                        name="photo"
-                                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                        onChange={handleInputChange}
-                                    />
-                                    {selectedBlindBox && selectedBlindBox.photo && (
-                                        <div className="mt-2">
-                                            <img src={`http://localhost:7001/${selectedBlindBox.photo}`} alt="当前照片" className="w-32 h-32 object-cover" />
-                                            <p className="text-sm text-gray-500 mt-1">当前照片</p>
-                                        </div>
-                                    )}
-                                </div>
-                                {/* 款式信息 */}
-                                <h3 className="text-lg font-bold text-gray-800 mb-2">款式信息</h3>
                                 
-                                {/* 显示现有款式 */}
-                                {formData.styles.map((style, index) => (
-                                    <div key={index} className="mb-4 p-3 border border-gray-200 rounded-lg">
-                                        {/* 编辑状态 */}
-                                        {index === editingStyleIndex ? (
-                                            <div>
-                                                <div className="flex items-center mb-2">
-                                                    <img 
-                                                        src={style.photo ? 
-                                                            URL.createObjectURL(style.photo) : 
-                                                            (style.photoUrl || `http://localhost:7001/${style.photo}`)} 
-                                                        alt={style.name} 
-                                                        className="w-16 h-16 mr-2 object-cover" 
-                                                    />
-                                                    <span className="text-gray-600 font-bold">编辑款式: {style.name}</span>
-                                                </div>
-                                                <div className="mb-2">
-                                                    <label className="block text-gray-700 text-sm font-bold mb-1">
-                                                        款式名称
-                                                    </label>
-                                                    <input
-                                                        type="text"
-                                                        name="name"
-                                                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                                        placeholder="请输入款式名称"
-                                                        value={style.name}
-                                                        onChange={(e) => handleEditingStyleInputChange(e, index)}
-                                                    />
-                                                </div>
-                                                <div className="mb-2">
-                                                    <label className="block text-gray-700 text-sm font-bold mb-1">
-                                                        款式照片
-                                                    </label>
-                                                    <input
-                                                        type="file"
-                                                        name="photo"
-                                                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                                        onChange={(e) => handleEditingStyleInputChange(e, index)}
-                                                    />
-                                                </div>
-                                                <div className="mb-2">
-                                                    <label className="block text-gray-700 text-sm font-bold mb-1">
-                                                        抽取概率
-                                                    </label>
-                                                    <input
-                                                        type="number"
-                                                        name="probability"
-                                                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                                        placeholder="请输入抽取概率"
-                                                        value={style.probability}
-                                                        onChange={(e) => handleEditingStyleInputChange(e, index)}
-                                                    />
-                                                </div>
-                                                <div className="flex justify-end">
-                                                    <button
-                                                        type="button"
-                                                        className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition-colors mr-2"
-                                                        onClick={cancelEditingStyle}
-                                                    >
-                                                        取消
-                                                    </button>
-                                                    <button
-                                                        type="button"
-                                                        className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md transition-colors"
-                                                        onClick={() => saveEditingStyle(index)}
-                                                    >
-                                                        保存
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            // 查看状态
-                                            <div className="flex items-center justify-between">
-                                                <div className="flex items-center">
-                                                    <img 
-                                                        src={style.photo ? 
-                                                            URL.createObjectURL(style.photo) : 
-                                                            (style.photoUrl || `http://localhost:7001/${style.photo}`)} 
-                                                        alt={style.name} 
-                                                        className="w-16 h-16 mr-2 object-cover" 
-                                                    />
-                                                    <div>
-                                                        <p className="text-gray-800 font-bold">{style.name}</p>
-                                                        <p className="text-gray-600">抽取概率: {style.probability}</p>
-                                                    </div>
-                                                </div>
-                                                <div className="flex">
-                                                    <button
-                                                        className="bg-yellow-500 hover:bg-yellow-600 text-white px-2 py-1 rounded-md mr-2"
-                                                        onClick={() => startEditingStyle(index)}
-                                                    >
-                                                        编辑
-                                                    </button>
-                                                    <button
-                                                        className="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded-md"
-                                                        onClick={() => removeStyle(index)}
-                                                    >
-                                                        删除
-                                                    </button>
-                                                </div>
+                                {/* 错误提示 */}
+                                {errorMessage && (
+                                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                                        <strong>错误:</strong> {errorMessage}
+                                    </div>
+                                )}
+                                
+                                <form>
+                                    <div className="mb-4">
+                                        <label htmlFor="name" className="block text-gray-700 text-sm font-bold mb-2">
+                                            名称
+                                        </label>
+                                        <input
+                                            type="text"
+                                            id="name"
+                                            name="name"
+                                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                            placeholder="请输入名称"
+                                            value={formData.name}
+                                            onChange={handleInputChange}
+                                        />
+                                    </div>
+                                    <div className="mb-4">
+                                        <label htmlFor="description" className="block text-gray-700 text-sm font-bold mb-2">
+                                            描述
+                                        </label>
+                                        <textarea
+                                            id="description"
+                                            name="description"
+                                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                            placeholder="请输入描述"
+                                            value={formData.description}
+                                            onChange={handleInputChange}
+                                        />
+                                    </div>
+                                    <div className="mb-4">
+                                        <label htmlFor="price" className="block text-gray-700 text-sm font-bold mb-2">
+                                            价格
+                                        </label>
+                                        <input
+                                            type="number"
+                                            id="price"
+                                            name="price"
+                                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                            placeholder="请输入价格"
+                                            value={formData.price}
+                                            onChange={handleInputChange}
+                                        />
+                                    </div>
+                                    <div className="mb-4">
+                                        <label htmlFor="photo" className="block text-gray-700 text-sm font-bold mb-2">
+                                            照片
+                                        </label>
+                                        <input
+                                            type="file"
+                                            id="photo"
+                                            name="photo"
+                                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                            onChange={handleInputChange}
+                                        />
+                                        {selectedBlindBox && selectedBlindBox.photo && (
+                                            <div className="mt-2">
+                                                <img src={`http://localhost:7001/${selectedBlindBox.photo}`} alt="当前照片" className="w-32 h-32 object-cover" />
+                                                <p className="text-sm text-gray-500 mt-1">当前照片</p>
                                             </div>
                                         )}
                                     </div>
-                                ))}
-                                
-                                {/* 添加新款式表单 */}
-                                <h4 className="text-base font-bold text-gray-800 mb-2">添加新款式</h4>
-                                <div className="mb-4">
-                                    <label htmlFor="styleName" className="block text-gray-700 text-sm font-bold mb-2">
-                                        款式名称
-                                    </label>
-                                    <input
-                                        type="text"
-                                        id="styleName"
-                                        name="name"
-                                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                        placeholder="请输入款式名称"
-                                        value={styleFormData.name}
-                                        onChange={handleStyleInputChange}
-                                    />
-                                </div>
-                                <div className="mb-4">
-                                    <label htmlFor="stylePhoto" className="block text-gray-700 text-sm font-bold mb-2">
-                                        款式照片
-                                    </label>
-                                    <input
-                                        type="file"
-                                        id="stylePhoto"
-                                        name="photo"
-                                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                        onChange={handleStyleInputChange}
-                                    />
-                                </div>
-                                <div className="mb-4">
-                                    <label htmlFor="styleProbability" className="block text-gray-700 text-sm font-bold mb-2">
-                                        抽取概率
-                                    </label>
-                                    <input
-                                        type="number"
-                                        id="styleProbability"
-                                        name="probability"
-                                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                        placeholder="请输入抽取概率"
-                                        value={styleFormData.probability}
-                                        onChange={handleStyleInputChange}
-                                    />
-                                </div>
-                                <button
-                                    type="button" // 防止表单提交
-                                    className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition-colors mb-4"
-                                    onClick={addStyle}
-                                >
-                                    添加款式
-                                </button>
-                                <div className="flex justify-between items-center">
+                                    {/* 款式信息 */}
+                                    <h3 className="text-lg font-bold text-gray-800 mb-2">款式信息</h3>
+                                    
+                                    {/* 显示现有款式 */}
+                                    {formData.styles.map((style, index) => (
+                                        <div key={index} className="mb-4 p-3 border border-gray-200 rounded-lg">
+                                            {/* 编辑状态 */}
+                                            {index === editingStyleIndex ? (
+                                                <div>
+                                                    <div className="flex items-center mb-2">
+                                                        <img 
+                                                            src={style.photo ? 
+                                                                URL.createObjectURL(style.photo) : 
+                                                                (style.photoUrl || `http://localhost:7001/${style.photo}`)} 
+                                                            alt={style.name} 
+                                                            className="w-16 h-16 mr-2 object-cover" 
+                                                        />
+                                                        <span className="text-gray-600 font-bold">编辑款式: {style.name}</span>
+                                                    </div>
+                                                    <div className="mb-2">
+                                                        <label className="block text-gray-700 text-sm font-bold mb-1">
+                                                            款式名称
+                                                        </label>
+                                                        <input
+                                                            type="text"
+                                                            name="name"
+                                                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                                            placeholder="请输入款式名称"
+                                                            value={style.name}
+                                                            onChange={(e) => handleEditingStyleInputChange(e, index)}
+                                                        />
+                                                    </div>
+                                                    <div className="mb-2">
+                                                        <label className="block text-gray-700 text-sm font-bold mb-1">
+                                                            款式照片
+                                                        </label>
+                                                        <input
+                                                            type="file"
+                                                            name="photo"
+                                                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                                            onChange={(e) => handleEditingStyleInputChange(e, index)}
+                                                        />
+                                                    </div>
+                                                    <div className="mb-2">
+                                                        <label className="block text-gray-700 text-sm font-bold mb-1">
+                                                            抽取概率
+                                                        </label>
+                                                        <input
+                                                            type="number"
+                                                            name="probability"
+                                                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                                            placeholder="请输入抽取概率"
+                                                            value={style.probability}
+                                                            onChange={(e) => handleEditingStyleInputChange(e, index)}
+                                                        />
+                                                    </div>
+                                                    <div className="flex justify-end">
+                                                        <button
+                                                            type="button"
+                                                            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition-colors mr-2"
+                                                            onClick={cancelEditingStyle}
+                                                        >
+                                                            取消
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md transition-colors"
+                                                            onClick={() => saveEditingStyle(index)}
+                                                        >
+                                                            保存
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                // 查看状态
+                                                <div className="flex items-center justify-between">
+                                                    <div className="flex items-center">
+                                                        <img 
+                                                            src={style.photo ? 
+                                                                URL.createObjectURL(style.photo) : 
+                                                                (style.photoUrl || `http://localhost:7001/${style.photo}`)} 
+                                                            alt={style.name} 
+                                                            className="w-16 h-16 mr-2 object-cover" 
+                                                        />
+                                                        <div>
+                                                            <p className="text-gray-800 font-bold">{style.name}</p>
+                                                            <p className="text-gray-600">抽取概率: {style.probability}</p>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex">
+                                                        <button
+                                                            className="bg-yellow-500 hover:bg-yellow-600 text-white px-2 py-1 rounded-md mr-2"
+                                                            onClick={() => startEditingStyle(index)}
+                                                        >
+                                                            编辑
+                                                        </button>
+                                                        <button
+                                                            className="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded-md"
+                                                            onClick={() => removeStyle(index)}
+                                                        >
+                                                            删除
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                    
+                                    {/* 添加新款式表单 */}
+                                    <h4 className="text-base font-bold text-gray-800 mb-2">添加新款式</h4>
+                                    <div className="mb-4">
+                                        <label htmlFor="styleName" className="block text-gray-700 text-sm font-bold mb-2">
+                                            款式名称
+                                        </label>
+                                        <input
+                                            type="text"
+                                            id="styleName"
+                                            name="name"
+                                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                            placeholder="请输入款式名称"
+                                            value={styleFormData.name}
+                                            onChange={handleStyleInputChange}
+                                        />
+                                    </div>
+                                    <div className="mb-4">
+                                        <label htmlFor="stylePhoto" className="block text-gray-700 text-sm font-bold mb-2">
+                                            款式照片
+                                        </label>
+                                        <input
+                                            type="file"
+                                            id="stylePhoto"
+                                            name="photo"
+                                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                            onChange={handleStyleInputChange}
+                                        />
+                                    </div>
+                                    <div className="mb-4">
+                                        <label htmlFor="styleProbability" className="block text-gray-700 text-sm font-bold mb-2">
+                                            抽取概率
+                                        </label>
+                                        <input
+                                            type="number"
+                                            id="styleProbability"
+                                            name="probability"
+                                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                            placeholder="请输入抽取概率"
+                                            value={styleFormData.probability}
+                                            onChange={handleStyleInputChange}
+                                        />
+                                    </div>
                                     <button
                                         type="button" // 防止表单提交
-                                        className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md transition-colors"
-                                        onClick={modalType === 'edit' ? handleUpdate : handleCreate}
+                                        className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition-colors mb-4"
+                                        onClick={addStyle}
                                     >
-                                        {modalType === 'edit' ? '保存修改' : '创建'}
+                                        添加款式
                                     </button>
-                                    <button
-                                        type="button" // 防止表单提交
-                                        className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition-colors"
-                                        onClick={closeModal}
-                                    >
-                                        取消
-                                    </button>
+                                    <div className="flex justify-between items-center">
+                                        <button
+                                            type="button" // 防止表单提交
+                                            className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md transition-colors"
+                                            onClick={modalType === 'edit' ? handleUpdate : handleCreate}
+                                        >
+                                            {modalType === 'edit' ? '保存修改' : '创建'}
+                                        </button>
+                                        <button
+                                            type="button" // 防止表单提交
+                                            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition-colors"
+                                            onClick={closeModal}
+                                        >
+                                            取消
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </div>
+            {/* 侧边栏：玩家秀入口+排行榜，侧边栏高度不超过主内容区 */}
+            <aside className="w-full md:w-96 md:min-w-[320px] md:max-w-xs mt-8 md:mt-0 flex-shrink-0">
+                <div className="flex flex-col sticky top-8" style={{ maxHeight: 'calc(100vh - 4rem)' }}>
+                    {/* 玩家秀入口模块 */}
+                    <div className="bg-gradient-to-r from-pink-400 to-yellow-300 rounded-xl shadow-lg p-6 mb-4 flex items-center cursor-pointer hover:scale-105 transition-transform" onClick={() => navigate('/player-shows')}>
+                        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="玩家秀" className="w-16 h-16 mr-6" />
+                        <div>
+                            <div className="text-2xl font-bold text-white mb-1">玩家秀</div>
+                            <div className="text-white text-opacity-90">看看大家都晒了哪些好物，分享你的盲盒体验！</div>
+                        </div>
+                    </div>
+                    {/* 排行榜 */}
+                    <div className="bg-white rounded-xl shadow-lg p-6 flex-1 overflow-auto">
+                        <h2 className="text-xl font-bold text-gray-800 mb-4">盲盒排行榜</h2>
+                        {rankingError && (
+                            <div className="text-red-500 mb-2">{rankingError}</div>
+                        )}
+                        <div className="space-y-4">
+                            {ranking.map((item, idx) => (
+                                <div key={item.id} className="flex items-center bg-gray-50 rounded-lg shadow p-4">
+                                    <div className="mr-4">
+                                        <img src={`http://localhost:7001/${item.photo}`} alt={item.name} className="w-16 h-16 object-cover rounded" />
+                                    </div>
+                                    <div className="flex-1">
+                                        <div className="flex items-center mb-1">
+                                            <span className="text-lg font-bold text-gray-800 mr-2">{idx + 1}.</span>
+                                            <span className="text-lg font-bold text-gray-800">{item.name}</span>
+                                        </div>
+                                        <div className="text-gray-600 mb-1 line-clamp-2">{item.description}</div>
+                                        <div className="flex items-center mb-1">
+                                            <StarRating rating={Math.round(item.avg_rating)} />
+                                            <span className="text-gray-700 font-semibold mr-2">{item.avg_rating.toFixed(2)} 分</span>
+                                            <span className="text-gray-500 text-sm">({item.show_count} 人评分)</span>
+                                        </div>
+                                    </div>
                                 </div>
-                            </form>
+                            ))}
                         </div>
                     </div>
                 </div>
-            )}
+            </aside>
         </div>
     );
 };
