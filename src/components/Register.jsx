@@ -33,6 +33,20 @@ const Register = () => {
             return;
         }
 
+        // 密码强度校验
+        const password = formData.password;
+        const strengthChecks = [
+            /[A-Z]/.test(password), // 大写字母
+            /[a-z]/.test(password), // 小写字母
+            /[0-9]/.test(password), // 数字
+            /[^A-Za-z0-9]/.test(password) // 特殊字符
+        ];
+        const passedChecks = strengthChecks.filter(Boolean).length;
+        if (password.length < 8 || passedChecks < 3) {
+            alert('密码强度不足，需至少8位且包含大写字母、小写字母、数字、特殊字符中的三种');
+            return;
+        }
+
         // 验证密码一致性
         if (formData.password !== formData.confirmPassword) {
             alert('两次输入的密码不一致');
