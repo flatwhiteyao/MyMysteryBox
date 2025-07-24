@@ -17,6 +17,8 @@ const BlindBoxPage = () => {
     const [editingStyleIndex, setEditingStyleIndex] = useState(-1); // 正在编辑的款式索引，-1表示未编辑任何款式
     const [ranking, setRanking] = useState([]);
     const [rankingError, setRankingError] = useState('');
+    const [ad, setAd] = useState(null);
+    const [showAd, setShowAd] = useState(true);
 
     const navigate = useNavigate();
     const location = useLocation();
@@ -32,6 +34,7 @@ const BlindBoxPage = () => {
     useEffect(() => {
         fetchBlindBoxes();
         fetchRanking();
+        fetchAd();
     }, []);
 
     // 搜索过滤效果
@@ -76,6 +79,29 @@ const BlindBoxPage = () => {
             setRankingError('网络错误，无法获取排行榜');
         }
     };
+
+    const fetchAd = async () => {
+        try {
+            const response = await fetch('http://localhost:7001/ad');
+            const data = await response.json();
+            if (data.success) {
+                setAd(data.ad);
+            }
+        } catch (error) {
+            // 广告接口失败不影响主流程
+        }
+    };
+
+    // 广告语列表
+    const adSlogans = [
+        '限时抢购，错过不再有！',
+        '新品上市，快来体验！',
+        '人气爆款，等你来开！',
+        '盲盒惊喜，等你发现！',
+        '今日推荐，超值好礼！'
+    ];
+    // 随机选择一条广告语
+    const randomSlogan = adSlogans[Math.floor(Math.random() * adSlogans.length)];
 
     // 管理模式切换
     const toggleManageMode = () => {
@@ -374,6 +400,38 @@ const BlindBoxPage = () => {
 
     return (
         <div className="min-h-screen bg-gray-100 p-4 md:p-8 flex flex-col md:flex-row">
+            {/* 广告弹窗 */}
+            {ad && showAd && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+                    <div className="relative w-full max-w-md">
+                        <div
+                            className="bg-gradient-to-br from-pink-200 via-yellow-100 to-pink-100 rounded-2xl shadow-2xl p-0 overflow-hidden border-4 border-pink-300 cursor-pointer group transition-transform duration-300 hover:scale-105"
+                            onClick={() => navigate(`/blind-box/${String(ad.id)}`, { state: { ad } })}
+                        >
+                            <div className="flex flex-col items-center p-8">
+                                <span className="px-3 py-1 bg-pink-500 text-white text-xs font-bold rounded mb-4 shadow">广告</span>
+                                <div className="mb-4 w-40 h-40 flex items-center justify-center overflow-hidden rounded-xl bg-white shadow-lg">
+                                    <img
+                                        src={`http://localhost:7001/${ad.photo}`}
+                                        alt={ad.name}
+                                        className="w-40 h-40 object-cover rounded-xl transform transition-transform duration-300 group-hover:scale-110"
+                                    />
+                                </div>
+                                <h2 className="text-2xl font-extrabold mb-2 text-pink-700 drop-shadow">{ad.name}</h2>
+                                <p className="text-gray-700 mb-2 text-center">{ad.description}</p>
+                                <p className="text-xl font-bold text-pink-600 mb-2 drop-shadow">价格：{ad.price} 元</p>
+                                <p className="text-pink-500 font-bold mt-2 text-lg animate-pulse">{randomSlogan}</p>
+                            </div>
+                        </div>
+                        <button
+                            className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-2xl font-bold focus:outline-none z-10 bg-white bg-opacity-80 rounded-full w-10 h-10 flex items-center justify-center shadow-lg border border-pink-200"
+                            onClick={e => { e.stopPropagation(); setShowAd(false); }}
+                        >
+                            ×
+                        </button>
+                    </div>
+                </div>
+            )}
             {/* 主内容区 */}
             <div className="flex-1 md:mr-8">
                 {/* 顶部导航栏 */}
@@ -790,7 +848,11 @@ const BlindBoxPage = () => {
                         )}
                         <div className="space-y-4">
                             {ranking.map((item, idx) => (
-                                <div key={item.id} className="flex items-center bg-gray-50 rounded-lg shadow p-4">
+                                <div
+                                    key={item.id}
+                                    className="flex items-center bg-gray-50 rounded-lg shadow p-4 cursor-pointer hover:bg-yellow-100 transition"
+                                    onClick={() => navigate(`/blind-box/${item.id}`)}
+                                >
                                     <div className="mr-4">
                                         <img src={`http://localhost:7001/${item.photo}`} alt={item.name} className="w-16 h-16 object-cover rounded" />
                                     </div>

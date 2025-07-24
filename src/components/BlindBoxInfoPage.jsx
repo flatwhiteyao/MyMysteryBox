@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 
 const BlindBoxInfoPage = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const [blindBox, setBlindBox] = useState(null);
+    const location = useLocation();
+    const adFromState = location.state?.ad;
+    const [blindBox, setBlindBox] = useState(adFromState || null);
     const [styles, setStyles] = useState([]);
 
     useEffect(() => {
+        if (adFromState) return; // 有广告数据直接用
         const fetchBlindBox = async () => {
             try {
                 const response = await fetch(`http://localhost:7001/blind-box?id=${id}`);
@@ -22,7 +25,11 @@ const BlindBoxInfoPage = () => {
                 alert('网络错误，请稍后重试');
             }
         };
+        fetchBlindBox();
+    }, [id, adFromState]);
 
+    useEffect(() => {
+        if (!id) return;
         const fetchStyles = async () => {
             try {
                 const response = await fetch(`http://localhost:7001/blind-box/styles?id=${id}`);
@@ -37,8 +44,6 @@ const BlindBoxInfoPage = () => {
                 alert('网络错误，请稍后重试');
             }
         };
-
-        fetchBlindBox();
         fetchStyles();
     }, [id]);
 
