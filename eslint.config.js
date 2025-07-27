@@ -16,7 +16,15 @@ export default [
         document: 'readonly',
         fetch: 'readonly',
         localStorage: 'readonly',
-        alert: 'readonly'
+        alert: 'readonly',
+        jest: 'readonly',
+        describe: 'readonly',
+        test: 'readonly',
+        expect: 'readonly',
+        beforeEach: 'readonly',
+        afterEach: 'readonly',
+        beforeAll: 'readonly',
+        afterAll: 'readonly'
       }
     },
     plugins: {
@@ -34,7 +42,9 @@ export default [
       'node_modules/**',
       '*.config.js',
       '.lighthouserc.js',
-      'babel.config.js'
+      'babel.config.js',
+      'src/setupTests.js',
+      'src/__mocks__/**'
     ]
   }
 ];
