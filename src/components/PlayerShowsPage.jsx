@@ -27,7 +27,7 @@ const PlayerShowsPage = () => {
       .catch(() => setLoading(false));
   }, []);
 
-  const fetchList = () => {
+  const _fetchList = () => {
     setLoading(true);
     fetch('http://localhost:7001/player-shows')
       .then(res => res.json())

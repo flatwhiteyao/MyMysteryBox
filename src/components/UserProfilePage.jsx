@@ -1,5 +1,5 @@
 // doubao/frontend/components/UserProfilePage.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 const UserProfilePage = () => {
@@ -53,7 +53,7 @@ const UserProfilePage = () => {
             } else {
                 alert(data.message);
             }
-        } catch (error) {
+        } catch {
             alert('更新失败，请稍后重试');
         }
     };

@@ -75,7 +75,7 @@ const BlindBoxPage = () => {
             } else {
                 setRankingError(data.message || '获取排行榜失败');
             }
-        } catch (error) {
+        } catch {
             setRankingError('网络错误，无法获取排行榜');
         }
     };
@@ -87,7 +87,7 @@ const BlindBoxPage = () => {
             if (data.success) {
                 setAd(data.ad);
             }
-        } catch (error) {
+        } catch {
             // 广告接口失败不影响主流程
         }
     };
@@ -204,7 +204,7 @@ const BlindBoxPage = () => {
                 formDataToSend.append('photo', formData.photo);
             }
 
-            formData.styles.forEach((style, index) => {
+            formData.styles.forEach((style) => {
                 formDataToSend.append(`styleName`, style.name);
                 formDataToSend.append(`styleProbability`, style.probability);
                 if (style.photo) {
@@ -244,7 +244,7 @@ const BlindBoxPage = () => {
             formDataToSend.append('price', formData.price);
             formDataToSend.append('photo', formData.photo);
 
-            formData.styles.forEach((style, index) => {
+            formData.styles.forEach((style) => {
                 formDataToSend.append(`styleName`, style.name);
                 formDataToSend.append(`styleProbability`, style.probability);
                 formDataToSend.append(`stylePhoto`, style.photo);

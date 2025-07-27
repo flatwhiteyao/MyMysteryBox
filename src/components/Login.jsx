@@ -39,7 +39,7 @@ const Login = () => {
             } else {
                 alert(data.message);
             }
-        } catch (error) {
+        } catch {
             alert('登录失败，请稍后重试');
         }
     };

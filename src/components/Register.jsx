@@ -68,7 +68,7 @@ const Register = () => {
             } else {
                 alert(data.message);
             }
-        } catch (error) {
+        } catch {
             alert('注册失败，请稍后重试');
         }
     };
