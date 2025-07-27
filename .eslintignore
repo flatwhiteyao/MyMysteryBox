@@ -1,0 +1,20 @@
+# 配置文件
+*.config.js
+.lighthouserc.js
+babel.config.js
+.eslintrc.js
+
+# 测试文件
+src/components/__tests__/
+src/setupTests.js
+src/__mocks__/
+
+# 构建文件
+dist/
+build/
+
+# 依赖
+node_modules/
+
+# 其他
+*.min.js 

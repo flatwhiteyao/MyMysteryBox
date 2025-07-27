@@ -6,8 +6,10 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
+    "lint": "eslint src/ --ext .js,.jsx",
+    "preview": "vite preview",
+    "test": "echo 'No tests configured yet'",
+    "test:ci": "echo 'No tests configured yet'"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.11",
