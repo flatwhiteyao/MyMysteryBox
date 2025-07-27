@@ -1,4 +1,4 @@
-import '@testing-library/jest-dom';
+require('@testing-library/jest-dom');
 
 // Mock fetch globally
 global.fetch = jest.fn();
@@ -17,13 +17,6 @@ global.alert = jest.fn();
 
 // Mock useNavigate
 const mockNavigate = jest.fn();
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useNavigate: () => mockNavigate,
-  useLocation: () => ({
-    state: { user: { id: 1, nickname: 'TestUser', role: 'user' } }
-  })
-}));
 
 // Mock console methods to reduce noise in tests
 global.console = {

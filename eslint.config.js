@@ -1,14 +1,19 @@
-import js from '@eslint/js';
-import reactHooks from 'eslint-plugin-react-hooks';
-import reactRefresh from 'eslint-plugin-react-refresh';
+const js = require('@eslint/js');
+const reactHooks = require('eslint-plugin-react-hooks');
+const reactRefresh = require('eslint-plugin-react-refresh');
 
-export default [
+module.exports = [
   js.configs.recommended,
   {
     files: ['src/**/*.{js,jsx}'],
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'module',
+      parserOptions: {
+        ecmaFeatures: {
+          jsx: true
+        }
+      },
       globals: {
         React: 'readonly',
         console: 'readonly',
@@ -16,15 +21,7 @@ export default [
         document: 'readonly',
         fetch: 'readonly',
         localStorage: 'readonly',
-        alert: 'readonly',
-        jest: 'readonly',
-        describe: 'readonly',
-        test: 'readonly',
-        expect: 'readonly',
-        beforeEach: 'readonly',
-        afterEach: 'readonly',
-        beforeAll: 'readonly',
-        afterAll: 'readonly'
+        alert: 'readonly'
       }
     },
     plugins: {
@@ -46,5 +43,28 @@ export default [
       'src/setupTests.js',
       'src/__mocks__/**'
     ]
+  },
+  {
+    files: ['src/setupTests.js', 'src/__mocks__/**/*.js', 'src/**/__tests__/**/*.{js,jsx}'],
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+      globals: {
+        jest: 'readonly',
+        describe: 'readonly',
+        test: 'readonly',
+        expect: 'readonly',
+        beforeEach: 'readonly',
+        afterEach: 'readonly',
+        beforeAll: 'readonly',
+        afterAll: 'readonly',
+        global: 'readonly',
+        module: 'readonly',
+        console: 'readonly'
+      }
+    },
+    rules: {
+      'no-undef': 'off'
+    }
   }
 ];
